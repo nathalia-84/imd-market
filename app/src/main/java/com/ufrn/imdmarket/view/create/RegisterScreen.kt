@@ -22,23 +22,23 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ufrn.imdmarket.view.components.Header
 import androidx.compose.runtime.setValue
+import com.ufrn.imdmarket.model.ProductEntity
+import com.ufrn.imdmarket.viewmodel.AppViewModel
 
 @Composable
-fun RegisterScreen() {
-
+fun RegisterScreen(viewModel: AppViewModel) {
     val context = LocalContext.current
 
-    // Estados para os campos de texto
+    // Variaveis para os campos de texto
     var productCode by remember { mutableStateOf("") }
     var productName by remember { mutableStateOf("") }
     var productDescription by remember { mutableStateOf("") }
     var productStock by remember { mutableStateOf("") }
 
-    // Header do aplicativo
+    // Header do app
     Header(title = "IMDMarket")
 
     Column(
@@ -48,8 +48,7 @@ fun RegisterScreen() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-
-        // Título da Página
+        // Título
         Text(
             text = "Cadastrar Produto",
             style = MaterialTheme.typography.titleLarge,
@@ -58,19 +57,17 @@ fun RegisterScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Código do Produto
-
+        // Código do produto
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
-        ){
+        ) {
             Text(
                 text = "Código do Produto",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(bottom = 4.dp)
             )
         }
-
         OutlinedTextField(
             value = productCode,
             onValueChange = { productCode = it },
@@ -81,11 +78,11 @@ fun RegisterScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Nome do Produto
+        // Nome do produto
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
-        ){
+        ) {
             Text(
                 text = "Nome do Produto",
                 style = MaterialTheme.typography.bodyMedium,
@@ -101,11 +98,11 @@ fun RegisterScreen() {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Descrição do Produto
+        // Descrição do produto
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
-        ){
+        ) {
             Text(
                 text = "Descrição do Produto",
                 style = MaterialTheme.typography.bodyMedium,
@@ -117,15 +114,16 @@ fun RegisterScreen() {
             onValueChange = { productDescription = it },
             modifier = Modifier.fillMaxWidth(),
             maxLines = 4
+
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Estoque
+        // Quantidade em estoque
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterStart
-        ){
+        ) {
             Text(
                 text = "Estoque",
                 style = MaterialTheme.typography.bodyMedium,
@@ -142,16 +140,34 @@ fun RegisterScreen() {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-
-        // Botão de Cadastro
+        // Botão de cadastro
         Button(
             onClick = {
                 if (productCode.isBlank() || productName.isBlank() || productDescription.isBlank() || productStock.isBlank()) {
-                    // Exibir Toast caso falte algum campo
+                    // Mensagem de erro se algum campo está vazio
                     Toast.makeText(context, "Todos os campos são obrigatórios.", Toast.LENGTH_SHORT)
                         .show()
                 } else {
-                    // Persistir os dados
+                    val product = ProductEntity(
+                        productCode = productCode.toInt(),
+                        productName = productName,
+                        productDescription = productDescription,
+                        productStock = productStock.toInt()
+                    )
+
+                    viewModel.addProduct(product) { success ->
+                        if (success) {
+                            Toast.makeText(context, "Produto cadastrado com sucesso!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Erro ao adicionar produto!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+
+                    // Limpar as variaveis
+                    productCode = ""
+                    productName = ""
+                    productDescription = ""
+                    productStock = ""
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -159,10 +175,4 @@ fun RegisterScreen() {
             Text("Cadastrar Produto")
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ScreenPreview() {
-    RegisterScreen()
 }

@@ -22,13 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ufrn.imdmarket.view.components.Header
 import androidx.compose.runtime.setValue
+import com.ufrn.imdmarket.model.ProductEntity
+import com.ufrn.imdmarket.viewmodel.AppViewModel
 
 @Composable
-fun EditScreen() {
+fun EditScreen(viewModel: AppViewModel) {
 
     val context = LocalContext.current
 
@@ -146,23 +147,28 @@ fun EditScreen() {
         // Botão de Alterar Produto
         Button(
             onClick = {
-                if (productCode.isBlank()) {
-                    // Exibir Toast caso falte algum campo
-                    Toast.makeText(context, "Por favor, informe o código do produto", Toast.LENGTH_SHORT)
-                        .show()
+                if (productCode.isBlank() || productName.isBlank() || productDescription.isBlank() || productStock.isBlank()) {
+                    Toast.makeText(context, "Preencha todos os campos!", Toast.LENGTH_SHORT).show()
                 } else {
-                    // Persistir os dados
+                    val updatedProduct = ProductEntity(
+                        productCode = productCode.toInt(),
+                        productName = productName,
+                        productDescription = productDescription,
+                        productStock = productStock.toInt()
+                    )
+
+                    viewModel.updateProduct(productCode.toInt(), updatedProduct) { success ->
+                        if (success) {
+                            Toast.makeText(context, "Produto atualizado com sucesso!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Erro ao atualizar ou produto não encontrado.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Alterar Produto")
+            Text("Atualizar Produto")
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ScreenPreview() {
-    EditScreen()
 }

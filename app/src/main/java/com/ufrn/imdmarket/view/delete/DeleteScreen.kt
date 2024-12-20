@@ -23,16 +23,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ufrn.imdmarket.view.components.Header
+import com.ufrn.imdmarket.viewmodel.AppViewModel
 
 @Composable
-fun DeleteScreen() {
+fun DeleteScreen(viewModel: AppViewModel) {
 
     val context = LocalContext.current
 
-    // Estado para o campo de texto
+    // Variavel para o campo de texto
     var productCode by remember { mutableStateOf("") }
 
     // Header do aplicativo
@@ -49,7 +49,7 @@ fun DeleteScreen() {
         // Título da Página
         Text(
             text = "Deletar Produto",
-            style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
@@ -75,15 +75,22 @@ fun DeleteScreen() {
         Spacer(modifier = Modifier.height(16.dp))
 
 
-        // Botão de Cadastro
+        // Botão de Deletar Produto
         Button(
             onClick = {
                 if (productCode.isBlank()) {
-                    // Exibir Toast caso falte algum campo
+                    // Exibir Toast caso o campo esteja vazio
                     Toast.makeText(context, "Por favor, informe o código do produto", Toast.LENGTH_SHORT)
                         .show()
                 } else {
-                    // Persistir os dados
+                    // Chama a função no ViewModel
+                    viewModel.removeProduct(productCode.toInt()) { success ->
+                        if (success) {
+                            Toast.makeText(context, "Produto removido com sucesso!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Produto não encontrado!", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -91,10 +98,4 @@ fun DeleteScreen() {
             Text("Deletar Produto")
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun ScreenPreview() {
-    DeleteScreen()
 }
